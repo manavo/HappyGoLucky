@@ -67,33 +67,26 @@ function get_function_name()
 
 function load_view($view_name = null, $args = null, $return_output = false)
 {
-    try
-    {
-        $view_name = str_replace('.', '', $view_name);
+    $view_name = str_replace('.', '', $view_name);
 
-        $view_filename = SYSTEM_PATH.'/views/'.$view_name.'.php';
-        if (!is_null($view_name) && $view_name != '' && file_exists($view_filename) == true)
+    $view_filename = SYSTEM_PATH.'/views/'.$view_name.'.php';
+    if (!is_null($view_name) && $view_name != '' && file_exists($view_filename) == true)
+    {
+        if (is_array($args))
         {
-            if (is_array($args))
-            {
-                extract($args);
-            }
-            if ($return_output == true) {
-                ob_start();
-            }
-            require $view_filename;
-            if ($return_output == true) {
-                return ob_get_clean();
-            }
+            extract($args);
         }
-        else
-        {
-            error('Invalid view');
+        if ($return_output == true) {
+            ob_start();
+        }
+        require $view_filename;
+        if ($return_output == true) {
+            return ob_get_clean();
         }
     }
-    catch (hgl_exception $e)
+    else
     {
-        throw $e;
+        error('Invalid view');
     }
 }
 
@@ -131,22 +124,16 @@ function load_controller($controller_name)
 
 function execute_function($controller, $function_name)
 {
-    try
+    // try calling it anyway if the __call function exists, since that means the user wants to handle it themselves
+    if (method_exists($controller, $function_name) || method_exists($controller, '__call'))
     {
-        if (method_exists($controller, $function_name))
-        {
-            $uri_parts = get_uri_parts();
+        $uri_parts = get_uri_parts();
 
-            call_user_func_array(array($controller, $function_name), array_slice($uri_parts, 2));
-        }
-        else
-        {
-            error('Invalid function ('.$function_name.')');
-        }
+        call_user_func_array(array($controller, $function_name), array_slice($uri_parts, 2));
     }
-    catch (hgl_exception $e)
+    else
     {
-        throw $e;
+        error('Invalid function ('.$function_name.')');
     }
 }
 
