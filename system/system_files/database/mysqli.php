@@ -40,7 +40,7 @@ class mysqli_db_driver implements database_interface
             $this->stmt = $this->mysqli->prepare($sql);
             if ($this->stmt)
             {
-                if (is_array($args))
+                if (is_array($args) && count($args) > 0)
                 {
                     $params = array();
                     $params[] = "";
