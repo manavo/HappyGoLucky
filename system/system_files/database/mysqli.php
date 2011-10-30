@@ -47,6 +47,9 @@ class mysqli_db_driver implements database_interface
                     foreach ($args as $arg)
                     {
                         $params[0] .= "s";
+                        if (is_array($arg)) {
+                            throw new hgl_exception('Cannot convert an array to a string in order to be used in the query!');
+                        }
                         $params[] = $arg;
                     }
 
